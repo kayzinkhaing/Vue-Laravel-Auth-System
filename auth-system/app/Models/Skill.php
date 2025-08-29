@@ -21,8 +21,13 @@ class Skill extends Model
         'level' => 'integer',
     ];
 
+   // Correct MongoDB relation
     public function category()
     {
-        return $this->belongsTo(SkillCategory::class, 'skill_category_id');
+        return $this->belongsTo(SkillCategory::class, 'skill_category_id', '_id')
+                    ->withDefault([
+                        'id' => null,
+                        'name' => 'Uncategorized',
+                    ]);
     }
 }

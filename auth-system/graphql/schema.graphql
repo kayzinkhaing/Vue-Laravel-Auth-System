@@ -1,4 +1,9 @@
 # =====================
+# Scalars
+# =====================
+scalar DateTime
+
+# =====================
 # GraphQL Types
 # =====================
 
@@ -36,18 +41,17 @@ type Blog {
   published_at: String
   created_at: String
   updated_at: String
-  user: User            # 👈 embed full user info (not just user_id)
+  user: User
 }
 
 type Technology {
-    id: ID!
-    name: String!
-    slug: String
-    icon: String
-    created_at: String
-    updated_at: String
+  id: ID!
+  name: String!
+  slug: String
+  icon: String
+  created_at: String
+  updated_at: String
 }
-
 
 type Status {
   id: ID!
@@ -69,21 +73,21 @@ type Project {
 }
 
 type SkillCategory {
-  id: ID!
-  name: String!
+  id: ID
+  name: String
   description: String
   created_at: String
   updated_at: String
 }
 
 type Skill {
-  id: ID!
-  name: String!
-  level: Int!
+  id: ID
+  name: String
+  level: Int
   icon: String
-  category: SkillCategory @belongsTo
-  created_at: DateTime
-  updated_at: DateTime
+  category: SkillCategory   # <-- nested object, no @belongsTo
+  created_at: String
+  updated_at: String
 }
 
 # =====================
@@ -107,10 +111,10 @@ type Query {
     @field(resolver: "App\\GraphQL\\Queries\\UserQuery@current")
 
   blogs(limit: Int, search: String): [Blog!]!
-    @field(resolver: "App\\GraphQL\\Queries\\BlogQuery@all")   # 👈 match PHP
+    @field(resolver: "App\\GraphQL\\Queries\\BlogQuery@all")
 
   blog(id: ID!): Blog
-    @field(resolver: "App\\GraphQL\\Queries\\BlogQuery@find")  # 👈 match PHP
+    @field(resolver: "App\\GraphQL\\Queries\\BlogQuery@find")
 
   projects: [Project!]!
     @field(resolver: "App\\GraphQL\\Queries\\ProjectQuery@all")

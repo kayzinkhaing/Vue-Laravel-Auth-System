@@ -1,4 +1,9 @@
-import { gql } from '@apollo/client/core'
+import { gql } from '@apollo/client/core';
+import { gqlClient } from '../gql/client';
+
+// =====================
+// GraphQL Queries
+// =====================
 
 export const GET_SKILLS = gql`
   query GetSkills {
@@ -15,7 +20,7 @@ export const GET_SKILLS = gql`
       updated_at
     }
   }
-`
+`;
 
 export const GET_SKILL = gql`
   query GetSkill($id: ID!) {
@@ -32,21 +37,22 @@ export const GET_SKILL = gql`
       updated_at
     }
   }
-`
+`;
 
-import { gqlClient } from '../gql/client'
-// import { GET_SKILLS, GET_SKILL } from './skillQueries'
+// =====================
+// Functions
+// =====================
 
 export async function getSkills(): Promise<any[]> {
   try {
     const { data } = await gqlClient.query({
       query: GET_SKILLS,
       fetchPolicy: 'no-cache', // optional: disables caching
-    })
-    return Array.isArray(data.skills) ? data.skills : []
+    });
+    return Array.isArray(data.skills) ? data.skills : [];
   } catch (err) {
-    console.error('Error fetching skills:', err)
-    return []
+    console.error('Error fetching skills:', err);
+    return [];
   }
 }
 
@@ -56,10 +62,10 @@ export async function getSkill(id: number | string): Promise<any | null> {
       query: GET_SKILL,
       variables: { id },
       fetchPolicy: 'no-cache',
-    })
-    return data.skill ?? null
+    });
+    return data.skill ?? null;
   } catch (err) {
-    console.error(`Error fetching skill ${id}:`, err)
-    return null
+    console.error(`Error fetching skill ${id}:`, err);
+    return null;
   }
 }

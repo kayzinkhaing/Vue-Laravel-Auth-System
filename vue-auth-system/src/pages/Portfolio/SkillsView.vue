@@ -1,5 +1,5 @@
 <template>
-  <section class="skills-view py-20 px-6">
+  <section class="skills-view py-20 px-6 text-white">
     <div class="max-w-7xl mx-auto">
       <!-- Header -->
       <SectionTitle
@@ -59,9 +59,7 @@
 import { ref, onMounted } from "vue"
 import SectionTitle from "@/components/portfolio/SectionTitle.vue"
 import SkillBadge from "@/components/portfolio/SkillBadge.vue"
-
-import { gqlClient } from "@/api/gql/client"
-import { GET_SKILLS } from "@/api/queries/skillQuery"
+import { getSkills, getSkill } from "@/api/queries/skillQuery";
 
 interface Skill {
   name: string
@@ -90,30 +88,27 @@ async function loadSkills() {
   loading.value = true
   error.value = null
   try {
-    const { data } = await gqlClient.query({
-      query: GET_SKILLS,
-      fetchPolicy: "no-cache"
+    const skillsData = await getSkills()
+
+    // Group skills by category
+    const categoriesMap: Record<string, SkillCategory> = {}
+    skillsData.forEach(skill => {
+      const catTitle = skill.category?.name ?? "Uncategorized"
+      if (!categoriesMap[catTitle]) {
+        categoriesMap[catTitle] = {
+          title: catTitle,
+          iconClass: "bg-gradient-to-r from-blue-500 to-cyan-500",
+          skills: []
+        }
+      }
+      categoriesMap[catTitle].skills.push({
+        name: skill.name,
+        level: skill.level,
+        color: assignColor(skill.name)
+      })
     })
 
-    if (Array.isArray(data.skills)) {
-      const categoriesMap: Record<string, SkillCategory> = {}
-      data.skills.forEach((skill: any) => {
-        const catTitle = skill.category?.name ?? "Uncategorized"
-        if (!categoriesMap[catTitle]) {
-          categoriesMap[catTitle] = {
-            title: catTitle,
-            iconClass: "bg-gradient-to-r from-blue-500 to-cyan-500",
-            skills: []
-          }
-        }
-        categoriesMap[catTitle].skills.push({
-          name: skill.name,
-          level: skill.level,
-          color: assignColor(skill.name)
-        })
-      })
-      skillCategories.value = Object.values(categoriesMap)
-    }
+    skillCategories.value = Object.values(categoriesMap)
   } catch (err: any) {
     error.value = err.message || "Failed to load skills"
   } finally {

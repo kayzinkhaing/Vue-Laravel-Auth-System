@@ -14,8 +14,10 @@ class SkillCategory extends Model
         'slug',
     ];
 
+
+    // MongoDB hasMany relation
     public function skills()
     {
-        return $this->hasMany(Skill::class);
+        return $this->hasMany(Skill::class, 'skill_category_id', '_id');
     }
 }

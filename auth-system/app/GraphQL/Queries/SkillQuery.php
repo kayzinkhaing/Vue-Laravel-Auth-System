@@ -3,62 +3,79 @@
 namespace App\GraphQL\Queries;
 
 use MongoDB\Client as MongoClient;
+use MongoDB\BSON\ObjectId;
 
 class SkillQuery
 {
-    public function all(): array
+    protected MongoClient $mongo;
+    protected $collection;
+
+    public function __construct()
     {
-        $mongo = new MongoClient(env('MONGO_URL', 'mongodb://mongo:27017'));
-        $collection = $mongo->selectDatabase('read_model')->selectCollection('skills');
-
-        $cursor = $collection->find();
-        $docs = iterator_to_array($cursor, false);
-
-        return array_map(function ($d) {
-            return [
-                '_id' => isset($d->_id) ? (string) $d->_id : null,  // ObjectId as string
-                'id' => isset($d->id) ? (int) $d->id : null,
-                'name' => $d->name ?? null,
-                'level' => $d->level ?? null,
-                'icon' => $d->icon ?? null,
-
-                // 👇 FIX: return nested category as object for GraphQL
-                'category' => isset($d->category) ? [
-                    'id' => $d->category['id'] ?? null,
-                    'name' => $d->category['name'] ?? null,
-                    'description' => $d->category['description'] ?? null,
-                ] : null,
-
-                'created_at' => isset($d->created_at) ? $d->created_at : null,
-                'updated_at' => isset($d->updated_at) ? $d->updated_at : null,
-            ];
-        }, $docs);
+        // Initialize MongoDB connection
+        $this->mongo = new MongoClient(env('MONGO_URL', 'mongodb://mongo:27017'));
+        $this->collection = $this->mongo
+            ->selectDatabase('read_model')
+            ->selectCollection('skills');
     }
 
-    public function find($root, array $args): ?array
+    /**
+     * Map a MongoDB document to a Skill array (like an Eloquent model)
+     */
+    protected function mapDoc($doc): array
     {
-        $id = (int) ($args['id'] ?? 0);
-        if (!$id) return null;
-
-        $mongo = new MongoClient(env('MONGO_URL', 'mongodb://mongo:27017'));
-        $collection = $mongo->selectDatabase('read_model')->selectCollection('skills');
-
-        $doc = $collection->findOne(['id' => $id]);
-        if (!$doc) return null;
+        $category = isset($doc->category) ? (array)$doc->category : [];
 
         return [
-            '_id' => isset($doc->_id) ? (string) $doc->_id : null,
-            'id' => isset($doc->id) ? (int) $doc->id : null,
+            '_id' => isset($doc->_id) ? (string)$doc->_id : null,
+            'id' => $doc->id ?? null,
             'name' => $doc->name ?? null,
-            'level' => $doc->level ?? null,
+            'level' => isset($doc->level) ? (int)$doc->level : null,
             'icon' => $doc->icon ?? null,
-            'category' => isset($doc->category) ? [
-                'id' => $doc->category['id'] ?? null,
-                'name' => $doc->category['name'] ?? null,
-                'description' => $doc->category['description'] ?? null,
-            ] : null,
-            'created_at' => isset($doc->created_at) ? $doc->created_at : null,
-            'updated_at' => isset($doc->updated_at) ? $doc->updated_at : null,
+            'category' => [
+                'id' => $category['id'] ?? null,
+                'name' => $category['name'] ?? 'Uncategorized',
+                'description' => $category['description'] ?? null,
+            ],
+            // Keep raw MongoDB fields; frontend can parse if needed
+            'created_at' => $doc->created_at ?? null,
+            'updated_at' => $doc->updated_at ?? null,
         ];
+    }
+
+    /**
+     * Fetch all skills
+     */
+    public function all(): array
+    {
+        $cursor = $this->collection->find();
+        $docs = iterator_to_array($cursor, false);
+
+        return array_map(fn($doc) => $this->mapDoc($doc), $docs);
+    }
+
+    /**
+     * Fetch a single skill by ID
+     */
+    public function find($root, array $args): ?array
+    {
+        $id = $args['id'] ?? null;
+        if (!$id) return null;
+
+        // Try numeric ID first
+        $doc = $this->collection->findOne(['id' => (int)$id]);
+
+        // If not found, try Mongo ObjectId
+        if (!$doc) {
+            try {
+                $doc = $this->collection->findOne(['_id' => new ObjectId($id)]);
+            } catch (\Exception $e) {
+                $doc = null;
+            }
+        }
+
+        if (!$doc) return null;
+
+        return $this->mapDoc($doc);
     }
 }
