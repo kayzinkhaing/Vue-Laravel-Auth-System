@@ -33,6 +33,7 @@ class SyncPageToReadModel implements ShouldQueue
 
         $document = [
             '_id'       => $page->id,
+            'id'        => $page->id,                // keep your SQL integer id
             'title'     => $page->title,
             'slug'      => $page->slug,
             'content'   => $page->content,

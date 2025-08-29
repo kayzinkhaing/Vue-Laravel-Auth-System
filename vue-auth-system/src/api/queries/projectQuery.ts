@@ -22,7 +22,6 @@ export const GET_PROJECTS = gql`
         created_at
         updated_at
       }
-      created_at
       updated_at
     }
   }

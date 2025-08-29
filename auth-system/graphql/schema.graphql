@@ -67,6 +67,25 @@ type Project {
   created_at: String
   updated_at: String
 }
+
+type SkillCategory {
+  id: ID!
+  name: String!
+  description: String
+  created_at: String
+  updated_at: String
+}
+
+type Skill {
+  id: ID!
+  name: String!
+  level: Int!
+  icon: String
+  category: SkillCategory @belongsTo
+  created_at: DateTime
+  updated_at: DateTime
+}
+
 # =====================
 # GraphQL Queries
 # =====================
@@ -98,4 +117,10 @@ type Query {
 
   project(id: ID!): Project
     @field(resolver: "App\\GraphQL\\Queries\\ProjectQuery@find")
+
+  skills: [Skill!]!
+    @field(resolver: "App\\GraphQL\\Queries\\SkillQuery@all")
+
+  skill(id: ID!): Skill
+    @field(resolver: "App\\GraphQL\\Queries\\SkillQuery@find")
 }

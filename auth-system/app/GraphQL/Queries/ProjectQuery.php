@@ -13,7 +13,7 @@ class ProjectQuery
     {
         $mongo = new MongoClient(env('MONGO_URL', 'mongodb://mongo:27017'));
         $collection = $mongo->selectDatabase('read_model')->selectCollection('projects');
-
+        /** @var \MongoDB\Driver\CursorInterface $cursor */
         $cursor = $collection->find();
 
         $docs = iterator_to_array($cursor, false);
