@@ -6,6 +6,19 @@ scalar DateTime
 # =====================
 # GraphQL Types
 # =====================
+type Education {
+  id: ID!
+  user_id: ID
+  institution: String
+  degree: String
+  location: String
+  start_date: String
+  end_date: String
+  is_current: Boolean
+  details: String
+  created_at: String
+  updated_at: String
+}
 
 type Township {
   id: ID!
@@ -72,6 +85,7 @@ type Project {
   updated_at: String
 }
 
+<<<<<<< HEAD
 type SkillCategory {
   id: ID
   name: String
@@ -90,6 +104,20 @@ type Skill {
   updated_at: String
 }
 
+=======
+type Experience {
+  id: ID!
+  user_id: String
+  position: String!
+  company: String!
+  location: String
+  start_date: String
+  end_date: String
+  responsibilities: String
+  created_at: String
+  updated_at: String
+}
+>>>>>>> 2e1134428b69e648105d8dc41d4515424c01eb25
 # =====================
 # GraphQL Queries
 # =====================
@@ -122,9 +150,20 @@ type Query {
   project(id: ID!): Project
     @field(resolver: "App\\GraphQL\\Queries\\ProjectQuery@find")
 
+<<<<<<< HEAD
   skills: [Skill!]!
     @field(resolver: "App\\GraphQL\\Queries\\SkillQuery@all")
 
   skill(id: ID!): Skill
     @field(resolver: "App\\GraphQL\\Queries\\SkillQuery@find")
+=======
+    educations: [Education!]!
+    @field(resolver: "App\\GraphQL\\Queries\\EducationQuery@all")
+
+  education(id: ID!): Education
+    @field(resolver: "App\\GraphQL\\Queries\\EducationQuery@find")
+
+  experiences: [Experience!]!
+    @field(resolver: "App\\GraphQL\\Queries\\ExperienceQuery@all")
+>>>>>>> 2e1134428b69e648105d8dc41d4515424c01eb25
 }

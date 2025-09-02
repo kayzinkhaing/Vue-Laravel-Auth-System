@@ -32,6 +32,7 @@ class SyncEducationToReadModel implements ShouldQueue
         $collection = $client->selectDatabase(env('MONGO_DB_DATABASE', 'read_model'))
                              ->selectCollection('educations');
 
+<<<<<<< HEAD
     $document = [
         '_id' => $education->id, // always unique Mongo ObjectId
         'id' => $education->id,                // keep your SQL integer id
@@ -46,6 +47,22 @@ class SyncEducationToReadModel implements ShouldQueue
         'created_at' => $education->created_at,
         'updated_at' => $education->updated_at,
     ];
+=======
+        $document = [
+            '_id' => $education->id,
+            'id' => $education->id,
+            'user_id' => $education->user_id,
+            'institution' => $education->institution,
+            'degree' => $education->degree,
+            'location' => $education->location,
+            'start_date' => $education->start_date,
+            'end_date' => $education->end_date,
+            'is_current' => $education->is_current,
+            'details' => $education->details,
+            'created_at' => $education->created_at,
+            'updated_at' => $education->updated_at,
+        ];
+>>>>>>> 2e1134428b69e648105d8dc41d4515424c01eb25
 
         if ($this->action === 'update') {
             $collection->updateOne(

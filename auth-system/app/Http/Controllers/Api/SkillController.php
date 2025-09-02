@@ -18,6 +18,7 @@ class SkillController extends Controller
     protected QueryBus $queryBus;
 
     public function __construct(CommandBus $commandBus, QueryBus $queryBus)
+<<<<<<< HEAD
     {
         $this->commandBus = $commandBus;
         $this->queryBus = $queryBus;
@@ -25,14 +26,29 @@ class SkillController extends Controller
 
     public function index(Request $request)
     {
+=======
+    {
+        $this->commandBus = $commandBus;
+        $this->queryBus   = $queryBus;
+    }
+
+    /**
+     * Display a listing of skills.
+     */
+    public function index(Request $request)
+    {
+>>>>>>> 2e1134428b69e648105d8dc41d4515424c01eb25
         $skills = $this->queryBus->dispatch(
             new CrudQuery('Skill', 'list', $request->all())
         );
 
+<<<<<<< HEAD
         if (method_exists($skills, 'load')) {
             $skills->load('category');
         }
 
+=======
+>>>>>>> 2e1134428b69e648105d8dc41d4515424c01eb25
         return SkillResource::collection($skills);
     }
 
@@ -45,6 +61,7 @@ class SkillController extends Controller
         return new SkillResource($skill);
     }
 
+<<<<<<< HEAD
     public function show($id)
     {
         $skill = $this->queryBus->dispatch(
@@ -54,16 +71,50 @@ class SkillController extends Controller
         if ($skill && method_exists($skill, 'load')) {
             $skill->load('category');
         }
+=======
+    /**
+     * Display the specified skill.
+     */
+    public function show(int $id)
+    {
+        $skill = $this->queryBus->dispatch(
+            new CrudQuery('Skill', 'get', ['id' => $id])
+        );
 
         return new SkillResource($skill);
     }
 
+    /**
+     * Update the specified skill.
+     */
+    public function update(UpdateSkillRequest $request, int $id)
+    {
+        $payload = array_merge(['id' => $id], $request->validated());
+
+        $skill = $this->commandBus->dispatch(
+            new CrudCommand('Skill', 'update', $payload)
+        );
+>>>>>>> 2e1134428b69e648105d8dc41d4515424c01eb25
+
+        return new SkillResource($skill);
+    }
+
+<<<<<<< HEAD
     public function update(UpdateSkillRequest $request, $id)
     {
         $payload = array_merge(['id' => (int)$id], $request->validated());
 
         $skill = $this->commandBus->dispatch(
             new CrudCommand('Skill', 'update', $payload)
+=======
+    /**
+     * Remove the specified skill.
+     */
+    public function destroy(int $id)
+    {
+        $this->commandBus->dispatch(
+            new CrudCommand('Skill', 'delete', ['id' => $id])
+>>>>>>> 2e1134428b69e648105d8dc41d4515424c01eb25
         );
 
         return new SkillResource($skill);
